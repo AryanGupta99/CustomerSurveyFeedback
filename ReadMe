@@ -1,0 +1,3 @@
+Customer Survey Application is a utility designed to gather feedback from users through a simple survey form. 
+The application prompts users with a popup asking if they would like to participate in a survey that takes approximately 10 seconds to complete. 
+The survey consists of three questions rated on a scale of 1 to 10.
