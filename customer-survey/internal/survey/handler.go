@@ -4,11 +4,13 @@ import (
     "bytes"
     "context"
     "encoding/json"
+    "io"
     "net/http"
     "os"
     "time"
 
     "customer-survey/pkg/model"
+    "log"
 )
 
 // SubmitSurvey sends the survey to an external endpoint (Zoho Forms) if configured.
@@ -30,7 +32,12 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
         return nil
     }
 
-    client := &http.Client{Timeout: 5 * time.Second}
+    client := &http.Client{
+        Timeout: 5 * time.Second,
+        CheckRedirect: func(req *http.Request, via []*http.Request) error {
+            return http.ErrUseLastResponse // Don't follow redirects
+        },
+    }
     payload, _ := json.Marshal(resp)
     req, err := http.NewRequestWithContext(ctx, http.MethodPost, webhook, bytes.NewBuffer(payload))
     if err != nil {
@@ -43,6 +50,12 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
         return err
     }
     defer res.Body.Close()
+
+    // Read and log the response body for debugging
+    body, _ := io.ReadAll(res.Body)
+    log.Printf("Webhook response status: %s", res.Status)
+    log.Printf("Webhook response body: %s", string(body))
+
     if res.StatusCode >= 400 {
         return &httpError{StatusCode: res.StatusCode}
     }
