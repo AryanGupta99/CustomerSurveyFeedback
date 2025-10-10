@@ -1,0 +1,10 @@
+api_key: "your_api_key_here"
+zoho_forms_endpoint: "https://forms.zoho.com/api/v1/form"
+survey_timeout: 10
+questions:
+  - question: "How would you rate our service?"
+    scale: 10
+  - question: "How likely are you to recommend us to a friend?"
+    scale: 10
+  - question: "How satisfied are you with our product?"
+    scale: 10
