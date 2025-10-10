@@ -6,4 +6,5 @@ type SurveyResponse struct {
 	RatingQ1     int    `json:"rating_q1"`
 	RatingQ2     int    `json:"rating_q2"`
 	RatingQ3     int    `json:"rating_q3"`
+	Note         string `json:"note,omitempty"`
 }

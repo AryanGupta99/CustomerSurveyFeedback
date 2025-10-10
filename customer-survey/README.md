@@ -36,6 +36,20 @@ customer-survey
 ## Usage
 Upon launching the application, users will see a popup asking if they would like to fill out the survey. If they agree, they will be presented with a form containing three questions to rate on a scale of 1 to 10. Once completed, the responses will be processed and sent to the designated endpoint.
 
+## Running locally (PowerShell helper)
+I included a small helper script `run-survey.ps1` that checks for Go, optionally sets `ZOHO_WEBHOOK_URL`, and runs the server.
+
+Example (run and do not forward to Zoho):
+```powershell
+.\run-survey.ps1
+```
+
+Example (run and set Zoho webhook for this session):
+```powershell
+.\
+un-survey.ps1 "https://your-zoho-webhook"
+```
+
 ## Contributing
 Contributions are welcome! Please feel free to submit a pull request or open an issue for any enhancements or bug fixes.
 

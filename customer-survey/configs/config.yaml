@@ -1,3 +1,6 @@
+# Configuration for Customer Survey App
+# If you want submissions forwarded to Zoho Forms, set the webhook URL here or via environment variable ZOHO_WEBHOOK_URL
+zoho_webhook_url: ""
 api_key: "your_api_key_here"
 zoho_forms_endpoint: "https://forms.zoho.com/api/v1/form"
 survey_timeout: 10

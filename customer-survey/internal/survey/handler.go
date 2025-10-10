@@ -1,26 +1,54 @@
 package survey
 
 import (
-    "net/http"
+    "bytes"
+    "context"
     "encoding/json"
-    "github.com/yourusername/customer-survey/pkg/model"
+    "net/http"
+    "os"
+    "time"
+
+    "customer-survey/pkg/model"
 )
 
-func SubmitSurveyHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == http.MethodPost {
-        var response model.SurveyResponse
-        err := json.NewDecoder(r.Body).Decode(&response)
+// SubmitSurvey sends the survey to an external endpoint (Zoho Forms) if configured.
+// It returns an error if the forward fails.
+func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
+    // If a ZOHO_WEBHOOK_URL env var is set, POST to it.
+    webhook := os.Getenv("ZOHO_WEBHOOK_URL")
+    if webhook == "" {
+        // If not configured, append to a local submissions.log for local testing.
+        b, _ := json.Marshal(resp)
+        f, err := os.OpenFile("submissions.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
         if err != nil {
-            http.Error(w, err.Error(), http.StatusBadRequest)
-            return
+            // fallback to stdout
+            _, _ = os.Stdout.Write(append(b, '\n'))
+            return nil
         }
-
-        // Here you would typically send the response to Zoho Forms or another endpoint
-
-        w.WriteHeader(http.StatusOK)
-        json.NewEncoder(w).Encode(map[string]string{"message": "Survey submitted successfully!"})
-        return
+        defer f.Close()
+        f.Write(append(b, '\n'))
+        return nil
     }
 
-    http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+    client := &http.Client{Timeout: 5 * time.Second}
+    payload, _ := json.Marshal(resp)
+    req, err := http.NewRequestWithContext(ctx, http.MethodPost, webhook, bytes.NewBuffer(payload))
+    if err != nil {
+        return err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+    res, err := client.Do(req)
+    if err != nil {
+        return err
+    }
+    defer res.Body.Close()
+    if res.StatusCode >= 400 {
+        return &httpError{StatusCode: res.StatusCode}
+    }
+    return nil
 }
+
+type httpError struct{ StatusCode int }
+
+func (h *httpError) Error() string { return http.StatusText(h.StatusCode) }

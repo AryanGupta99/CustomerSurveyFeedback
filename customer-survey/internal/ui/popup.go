@@ -1,22 +1,31 @@
 package ui
 
 import (
-    "fmt"
-    "time"
-    "github.com/yourusername/yourproject/internal/survey"
+    "embed"
+    "io/fs"
+    "net/http"
+    "os"
 )
 
-func ShowSurveyPopup() {
-    // Simulate a popup asking the user if they want to fill out the survey
-    fmt.Println("Would you like to fill out a survey form? It will take approximately 10 seconds (yes/no):")
-    
-    var response string
-    fmt.Scanln(&response)
+//go:embed static
+var staticFiles embed.FS
 
-    if response == "yes" {
-        time.Sleep(10 * time.Second) // Simulate time taken to fill out the form
-        survey.DisplaySurveyForm()
-    } else {
-        fmt.Println("Thank you for your time!")
+// HandleIndex serves the main popup/index page
+func HandleIndex(w http.ResponseWriter, r *http.Request) {
+    // serve embedded static files
+    sub, _ := fs.Sub(staticFiles, "static")
+    http.FileServer(http.FS(sub)).ServeHTTP(w, r)
+}
+
+// ListSubmissions serves the contents of submissions.log as a simple HTML page
+func ListSubmissions(w http.ResponseWriter, r *http.Request) {
+    data, err := os.ReadFile("submissions.log")
+    if err != nil {
+        http.Error(w, "no submissions found", http.StatusNotFound)
+        return
     }
+    w.Header().Set("Content-Type", "text/html; charset=utf-8")
+    w.Write([]byte("<html><body><h2>Saved Submissions</h2><pre>"))
+    w.Write(data)
+    w.Write([]byte("</pre></body></html>"))
 }

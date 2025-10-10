@@ -1,37 +1,60 @@
 package ui
 
 import (
-    "fmt"
-    "github.com/yourusername/yourproject/internal/survey"
+    "encoding/json"
+    "io"
+    "log"
+    "net/http"
+    "os"
+
+    "customer-survey/internal/survey"
+    "customer-survey/pkg/model"
 )
 
-type SurveyForm struct {
-    Question1 int
-    Question2 int
-    Question3 int
-}
-
-func NewSurveyForm() *SurveyForm {
-    return &SurveyForm{}
-}
-
-func (f *SurveyForm) CollectResponses() {
-    fmt.Println("Please rate the following questions on a scale of 1 to 10:")
-
-    fmt.Print("Question 1: How satisfied are you with our service? ")
-    fmt.Scan(&f.Question1)
-
-    fmt.Print("Question 2: How likely are you to recommend us to a friend? ")
-    fmt.Scan(&f.Question2)
-
-    fmt.Print("Question 3: How would you rate the quality of our products? ")
-    fmt.Scan(&f.Question3)
-}
-
-func (f *SurveyForm) GetResponses() survey.Response {
-    return survey.Response{
-        Rating1: f.Question1,
-        Rating2: f.Question2,
-        Rating3: f.Question3,
+// HandleSurveySubmission accepts JSON payload from the UI and forwards it to survey handler
+func HandleSurveySubmission(w http.ResponseWriter, r *http.Request) {
+    if r.Method != http.MethodPost {
+        http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+        return
     }
+
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        http.Error(w, "could not read body", http.StatusBadRequest)
+        return
+    }
+
+    var incoming struct {
+        RatingQ1 int `json:"rating_q1"`
+        RatingQ2 int `json:"rating_q2"`
+        RatingQ3 int `json:"rating_q3"`
+        Note     string `json:"note"`
+    }
+    if err := json.Unmarshal(body, &incoming); err != nil {
+        http.Error(w, "invalid json", http.StatusBadRequest)
+        return
+    }
+
+    // enrich with local data
+    hostname, _ := os.Hostname()
+    user := os.Getenv("USERNAME")
+
+    resp := model.SurveyResponse{
+        ServerName: hostname,
+        UserName:   user,
+        RatingQ1:   incoming.RatingQ1,
+        RatingQ2:   incoming.RatingQ2,
+        RatingQ3:   incoming.RatingQ3,
+        Note:       incoming.Note,
+    }
+
+    if err := survey.SubmitSurvey(r.Context(), resp); err != nil {
+        log.Printf("error submitting survey: %v", err)
+        http.Error(w, "could not submit survey", http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(`{"message":"submitted"}`))
 }
