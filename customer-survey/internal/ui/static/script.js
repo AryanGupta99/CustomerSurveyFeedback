@@ -13,8 +13,12 @@ function updateProgress() {
   // Progress tracking removed for cleaner UI
 }
 
+let submitting = false;
+
 // Submit form with enhanced UX
 async function submitForm() {
+  if (submitting) return;
+  submitting = true;
   const submitBtn = document.querySelector('.submit-btn');
   const status = document.getElementById('status');
   const originalText = submitBtn.textContent;
@@ -70,6 +74,7 @@ async function submitForm() {
     submitBtn.disabled = false;
     submitBtn.textContent = originalText;
     submitBtn.style.opacity = '1';
+    submitting = false;
   }
 }
 

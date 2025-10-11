@@ -1,0 +1,28 @@
+{
+  "RT_VERSION": {
+    "1": {
+      "Fixed": {
+        "FileVersion": [1, 0, 1, 0],
+        "ProductVersion": [1, 0, 1, 0],
+        "FileFlags": 0,
+        "FileFlagsMask": "0x3f",
+        "FileOS": "VOS__WINDOWS32",
+        "FileType": "VFT_APP"
+      },
+      "Info": {
+        "1033": {
+          "ProductName": "Customer Survey",
+          "FileDescription": "Customer Survey Application",
+          "FileVersion": "1.0.1",
+          "ProductVersion": "1.0.1",
+          "OriginalFilename": "CustomerSurvey.exe"
+        }
+      }
+    }
+  },
+  "RT_GROUP_ICON": {
+    "MAINICON": {
+      "1033": "assets/icon.ico"
+    }
+  }
+}
