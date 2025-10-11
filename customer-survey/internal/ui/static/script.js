@@ -36,11 +36,11 @@ async function submitForm() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        rating_q1: q1,
-        rating_q2: q2,
-        rating_q3: q3,
-        note: note
-      })
+          server_performance: q1,
+          technical_support: q2,
+          overall_support: q3,
+          note: note
+        })
     });
     
     if (response.ok) {
