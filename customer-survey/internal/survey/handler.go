@@ -131,13 +131,26 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
 	// - feedback
 	// - survey_response (optional)
 	// - timestamp (optional)
+	// Map rating numbers to words
+	ratingWord := func(val int) string {
+		switch val {
+		case 3:
+			return "Good"
+		case 2:
+			return "Okay"
+		case 1:
+			return "Bad"
+		default:
+			return "Unknown"
+		}
+	}
 	payload := map[string]interface{}{
 		"server_name":        fmt.Sprintf("%v", resp.ServerName),
 		"username":           fmt.Sprintf("%v", resp.UserName),
 		"survey_response":    fmt.Sprintf("%v", resp.SurveyResponse),
-		"server_performance": fmt.Sprintf("%v", resp.ServerPerformance),
-		"technical_support":  fmt.Sprintf("%v", resp.TechnicalSupport),
-		"overall_rating":     fmt.Sprintf("%v", resp.OverallSupport),
+		"server_performance": ratingWord(resp.ServerPerformance),
+		"technical_support":  ratingWord(resp.TechnicalSupport),
+		"overall_rating":     ratingWord(resp.OverallSupport),
 		"feedback":           fmt.Sprintf("%v", resp.Note),
 		"timestamp":          time.Now().Format(time.RFC3339),
 	}

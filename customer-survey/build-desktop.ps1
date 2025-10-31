@@ -25,16 +25,14 @@ if ($LASTEXITCODE -eq 0) {
     $sizeMB = ([Math]::Round((Get-Item .\customer-survey.exe).Length / 1MB, 2))
     Write-Host ("   Size: {0} MB" -f $sizeMB) -ForegroundColor DarkGray
 
-    # Optional: UPX compress if available on PATH and not disabled
-    $upx = (Get-Command upx -ErrorAction SilentlyContinue)
-    if ($upx -and $env:NO_UPX -ne "1") {
-        Write-Host "Compressing with UPX (optional)..." -ForegroundColor Yellow
-        & $upx.Source upx --best --lzma .\customer-survey.exe | Out-Null
-        $sizeMB2 = ([Math]::Round((Get-Item .\customer-survey.exe).Length / 1MB, 2))
-        Write-Host ("   Compressed Size: {0} MB" -f $sizeMB2) -ForegroundColor DarkGray
-    } else {
-        Write-Host "Skipping UPX compression (not found or disabled via NO_UPX=1)." -ForegroundColor Yellow
-    }
+    # Skip UPX and code signing to avoid Crowdstrike detection
+    Write-Host "Skipping optional compression and signing for Crowdstrike compatibility..." -ForegroundColor Yellow
+    
+    Write-Host "`n⚠️  NOTE: If Crowdstrike still blocks this:" -ForegroundColor Yellow
+    Write-Host "   1. Contact your IT team to whitelist this exe in Crowdstrike" -ForegroundColor White
+    Write-Host "   2. Or request them to add an exclusion for ACH Customer Survey app" -ForegroundColor White
+    Write-Host "   3. Application hash: $(certUtil -hashfile '.\customer-survey.exe' SHA256 | findstr /v 'SHA256' | findstr /v 'CertUtil')" -ForegroundColor Gray
+    
     Write-Host "`nTo configure webhook, create config.json with:" -ForegroundColor Cyan
     Write-Host '   {"webhook_url": "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"}' -ForegroundColor White
     Write-Host "`nOr set environment variable:" -ForegroundColor Cyan

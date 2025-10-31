@@ -9,11 +9,25 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"runtime"
+	"syscall"
 	"time"
 )
 
 //go:embed static
 var staticFiles embed.FS
+
+func getScreenResolution() (int, int) {
+	if runtime.GOOS == "windows" {
+		user32 := syscall.NewLazyDLL("user32.dll")
+		getSystemMetrics := user32.NewProc("GetSystemMetrics")
+		width, _, _ := getSystemMetrics.Call(0)  // SM_CXSCREEN
+		height, _, _ := getSystemMetrics.Call(1) // SM_CYSCREEN
+		return int(width), int(height)
+	}
+	// Fallback for other OSes
+	return 1920, 1080
+}
 
 // RunDesktopUI launches the survey as a desktop application
 // It starts a local server and opens it in app mode (frameless window)
@@ -60,45 +74,73 @@ func getListener() (net.Listener, int, error) {
 
 // openAsApp opens the URL in application mode (frameless window) if possible
 func openAsApp(url string) {
-	// Try Edge in app mode first (looks like a native app - no address bar)
+	// Set window size to fit the survey form perfectly
+	formWidth := 420
+	formHeight := 700
+
+	// Get screen resolution
+	screenW, screenH := getScreenResolution()
+
+	// Center position
+	posX := (screenW - formWidth) / 2
+	posY := (screenH - formHeight) / 2
+
+	windowSize := fmt.Sprintf("--window-size=%d,%d", formWidth, formHeight)
+	windowPos := fmt.Sprintf("--window-position=%d,%d", posX, posY)
+
 	edgePaths := []string{
 		"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
 		"C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
 	}
-
 	for _, edgePath := range edgePaths {
 		if _, err := os.Stat(edgePath); err == nil {
-			// Launch Edge in app mode (frameless window) - compact size
 			cmd := exec.Command(edgePath,
 				"--app="+url,
-				"--window-size=420,600",
-				"--disable-features=TranslateUI",
+				windowSize,
+				windowPos,
+				"--disable-features=TranslateUI,VizDisplayCompositor,EdgeShortcutsSync,MicrosoftEdgeIntroShowNotification",
 				"--no-first-run",
-				"--force-device-scale-factor=0.9",
+				"--no-default-browser-check",
+				"--disable-gpu",
+				"--hide-scrollbars",
+				"--disable-background-timer-throttling",
+				"--disable-renderer-backgrounding",
+				"--disable-backgrounding-occluded-windows",
+				"--disable-sync",
+				"--disable-popup-blocking",
+				"--user-data-dir="+os.Getenv("TEMP")+"\\ace-survey-browser-"+fmt.Sprint(os.Getpid()),
 			)
 			if err := cmd.Start(); err == nil {
-				log.Printf("Launched in app mode via Edge")
+				log.Printf("Launched in app mode via Edge (separate profile)")
 				return
 			}
 		}
 	}
-
-	// Try Chrome in app mode
 	chromePaths := []string{
 		os.Getenv("LOCALAPPDATA") + "\\Google\\Chrome\\Application\\chrome.exe",
 		"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
 		"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
 	}
-
 	for _, chromePath := range chromePaths {
 		if _, err := os.Stat(chromePath); err == nil {
 			cmd := exec.Command(chromePath,
 				"--app="+url,
-				"--window-size=420,600",
-				"--force-device-scale-factor=0.9",
+				windowSize,
+				windowPos,
+				"--disable-gpu",
+				"--hide-scrollbars",
+				"--disable-features=VizDisplayCompositor,ChromeHeadless",
+				"--disable-background-timer-throttling",
+				"--disable-renderer-backgrounding",
+				"--disable-backgrounding-occluded-windows",
+				"--no-first-run",
+				"--no-default-browser-check",
+				"--disable-sync",
+				"--disable-popup-blocking",
+				"--user-data-dir="+os.Getenv("TEMP")+"\\ace-survey-browser-"+fmt.Sprint(os.Getpid()),
 			)
 			if err := cmd.Start(); err == nil {
-				log.Printf("Launched in app mode via Chrome")
+				log.Printf("Launched in app mode via Chrome (separate profile)")
 				return
 			}
 		}

@@ -142,15 +142,14 @@ async function submitForm() {
     });
     
     if (response.ok) {
-      // Success animation
-      status.textContent = '✅ Thank you! Your feedback helps us improve our services.';
-      status.className = 'status success show';
-      submitBtn.textContent = '✅ Feedback Submitted!';
+      // Hide survey form and show thank you screen
+      document.getElementById('surveyFormContainer').classList.add('hidden');
+      document.getElementById('thankYouScreen').classList.remove('hidden');
       
       // Close window after delay
       setTimeout(() => {
         window.close();
-      }, 2500);
+      }, 3500);
       
     } else {
       const errorText = await response.text();
@@ -177,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (textarea) {
     textarea.addEventListener('input', function() {
       this.style.height = 'auto';
-      this.style.height = Math.max(60, this.scrollHeight) + 'px';
+      this.style.height = Math.max(35, this.scrollHeight) + 'px';
     });
   }
 });
