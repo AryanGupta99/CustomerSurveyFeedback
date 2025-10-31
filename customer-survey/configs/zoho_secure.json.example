@@ -1,0 +1,11 @@
+{
+  "zoho": {
+    "account_owner": "YOUR_ZOHO_ACCOUNT_NAME",
+    "app_link_name": "customer_survey_collector",
+    "form_link_name": "Survey_Responses",
+    "client_id": "1000.XXXXXXXXXXXXXXXXXXXXX",
+    "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "refresh_token": "1000.yyyyy.zzzzz.aaaaa",
+    "data_center": "com"
+  }
+}

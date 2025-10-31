@@ -1,26 +1,119 @@
-// Update rating value display with animation
-function updateValue(elementId, value) {
-  const element = document.getElementById(elementId);
-  element.style.transform = 'scale(1.1)';
-  element.textContent = value;
-  setTimeout(() => {
-    element.style.transform = 'scale(1)';
-  }, 150);
+// Handle Yes button - show survey form
+function handleYes() {
+  document.getElementById('promptScreen').classList.add('hidden');
+  document.getElementById('surveyFormContainer').classList.remove('hidden');
 }
 
-// Placeholder for future progress tracking functionality
-function updateProgress() {
-  // Progress tracking removed for cleaner UI
+// Handle Remind Me Later button - close window with reminder flag
+async function handleRemindLater() {
+  const statusEl = document.getElementById('status');
+  const buttons = document.querySelectorAll('.prompt-btn');
+  
+  // Disable all buttons
+  buttons.forEach(btn => btn.disabled = true);
+  
+  statusEl.textContent = '⏰ We\'ll remind you next time!';
+  statusEl.className = 'status success show';
+  
+  // Submit reminder response
+  try {
+    await fetch('/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        survey_response: 'remind_later',
+        server_performance: 0,
+        technical_support: 0,
+        overall_support: 0,
+        note: 'User requested reminder later'
+      })
+    });
+  } catch (error) {
+    console.error('Error:', error);
+  }
+  
+  // Close window after delay
+  setTimeout(() => {
+    window.close();
+  }, 1500);
+}
+
+// Handle No button - submit declined response
+async function handleNo() {
+  const statusEl = document.getElementById('status');
+  const buttons = document.querySelectorAll('.prompt-btn');
+  
+  // Disable all buttons
+  buttons.forEach(btn => btn.disabled = true);
+  
+  statusEl.textContent = '⏳ Saving your preference...';
+  statusEl.className = 'status show';
+  
+  try {
+    // Submit declined response with just user details
+    const response = await fetch('/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        survey_response: 'declined',
+        server_performance: 0,
+        technical_support: 0,
+        overall_support: 0,
+        note: 'User declined to participate in survey'
+      })
+    });
+    
+    if (response.ok) {
+      statusEl.textContent = '✅ Thank you! Your preference has been recorded.';
+      statusEl.className = 'status success show';
+      
+      // Close window after delay
+      setTimeout(() => {
+        window.close();
+      }, 2000);
+    } else {
+      throw new Error('Submission failed');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    statusEl.textContent = '❌ Error recording response.';
+    statusEl.className = 'status error show';
+    
+    // Re-enable buttons
+    buttons.forEach(btn => btn.disabled = false);
+  }
 }
 
 let submitting = false;
 
-// Submit form with enhanced UX
+// Submit form with 1-2-3 rating system
 async function submitForm() {
   if (submitting) return;
+  
+  // Get selected ratings (1, 2, or 3)
+  const q1Radio = document.querySelector('input[name="q1"]:checked');
+  const q2Radio = document.querySelector('input[name="q2"]:checked');
+  const q3Radio = document.querySelector('input[name="q3"]:checked');
+  
+  // Validate all questions are answered
+  if (!q1Radio || !q2Radio || !q3Radio) {
+    const status = document.getElementById('formStatus');
+    status.textContent = '⚠️ Please answer all three questions before submitting.';
+    status.className = 'status error show';
+    
+    setTimeout(() => {
+      status.classList.remove('show');
+    }, 3000);
+    return;
+  }
+  
   submitting = true;
   const submitBtn = document.querySelector('.submit-btn');
-  const status = document.getElementById('status');
+  const status = document.getElementById('formStatus');
   const originalText = submitBtn.textContent;
   
   // Disable button and show loading state
@@ -28,10 +121,10 @@ async function submitForm() {
   submitBtn.textContent = '⏳ Submitting your feedback...';
   submitBtn.style.opacity = '0.7';
   
-  const q1 = parseInt(document.getElementById('q1').value, 10);
-  const q2 = parseInt(document.getElementById('q2').value, 10);
-  const q3 = parseInt(document.getElementById('q3').value, 10);
-  const note = document.getElementById('note').value.trim();
+  const q1 = parseInt(q1Radio ? q1Radio.value : "0", 10);
+  const q2 = parseInt(q2Radio ? q2Radio.value : "0", 10);
+  const q3 = parseInt(q3Radio ? q3Radio.value : "0", 10);
+  const note = document.getElementById('note').value.trim() || "";
   
   try {
     const response = await fetch('/submit', {
@@ -40,11 +133,12 @@ async function submitForm() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-          server_performance: q1,
-          technical_support: q2,
-          overall_support: q3,
-          note: note
-        })
+        survey_response: 'completed',
+        server_performance: q1,
+        technical_support: q2,
+        overall_support: q3,
+        note: note
+      })
     });
     
     if (response.ok) {
@@ -53,12 +147,10 @@ async function submitForm() {
       status.className = 'status success show';
       submitBtn.textContent = '✅ Feedback Submitted!';
       
-      // Optional: Reset form after delay
+      // Close window after delay
       setTimeout(() => {
-        if (confirm('Would you like to submit another response?')) {
-          location.reload();
-        }
-      }, 3000);
+        window.close();
+      }, 2500);
       
     } else {
       const errorText = await response.text();
@@ -80,37 +172,12 @@ async function submitForm() {
 
 // Add smooth interactions on page load
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize progress
-  updateProgress();
-  
-  // Add enhanced hover and interaction effects to sliders
-  const sliders = document.querySelectorAll('input[type="range"]');
-  sliders.forEach(slider => {
-    // Add smooth track fill animation
-    slider.addEventListener('input', function() {
-      const value = (this.value - this.min) / (this.max - this.min);
-      const percentage = value * 100;
-      this.style.background = `linear-gradient(to right, #0288d1 0%, #00acc1 ${percentage}%, #e0e0e0 ${percentage}%, #e0e0e0 100%)`;
-    });
-    
-    // Initialize track fill
-    const value = (slider.value - slider.min) / (slider.max - slider.min);
-    const percentage = value * 100;
-    slider.style.background = `linear-gradient(to right, #0288d1 0%, #00acc1 ${percentage}%, #e0e0e0 ${percentage}%, #e0e0e0 100%)`;
-    
-    slider.addEventListener('mouseover', function() {
-      this.style.transform = 'scaleY(1.1)';
-    });
-    
-    slider.addEventListener('mouseout', function() {
-      this.style.transform = 'scaleY(1)';
-    });
-  });
-  
   // Auto-resize textarea
   const textarea = document.getElementById('note');
-  textarea.addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.max(80, this.scrollHeight) + 'px';
-  });
+  if (textarea) {
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.max(60, this.scrollHeight) + 'px';
+    });
+  }
 });

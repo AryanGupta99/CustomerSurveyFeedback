@@ -14,34 +14,35 @@
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      padding: 20px;
+      padding: 15px;
       animation: fadeIn 0.8s ease-out;
+      font-size: 13px;
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .container { 
       background: white; 
-      padding: 24px; 
-      border-radius: 20px; 
+      padding: 18px; 
+      border-radius: 16px; 
       box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
       width: 100%; 
-      max-width: 480px;
+      max-width: 420px;
       animation: slideUp 0.6s ease-out;
     }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .header { text-align: center; margin-bottom: 20px; }
-    .icon { width: 60px; height: 60px; background: linear-gradient(135deg, #0288d1, #00acc1); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3); }
-    h1 { font-size: 28px; font-weight: 700; color: #0d47a1; margin-bottom: 12px; }
-    .subtitle { color: #37474f; font-size: 16px; line-height: 1.6; font-weight: 400; }
-    .question-group { margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 16px; border: 1px solid #e0e0e0; }
-    .question-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 700; color: #0d47a1; font-size: 16px; }
+    .header { text-align: center; margin-bottom: 16px; }
+    .icon { width: 48px; height: 48px; background: linear-gradient(135deg, #0288d1, #00acc1); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3); }
+    h1 { font-size: 20px; font-weight: 700; color: #0d47a1; margin-bottom: 8px; }
+    .subtitle { color: #37474f; font-size: 12px; line-height: 1.5; font-weight: 400; }
+    .question-group { margin-bottom: 16px; padding: 12px; background: #fafafa; border-radius: 12px; border: 1px solid #e0e0e0; }
+    .question-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; color: #0d47a1; font-size: 13px; }
     .rating-value { 
       background: linear-gradient(135deg, #0288d1, #00acc1); 
       color: white; 
-      padding: 6px 14px; 
-      border-radius: 20px; 
-      font-size: 14px; 
+      padding: 4px 12px; 
+      border-radius: 16px; 
+      font-size: 12px; 
       font-weight: 600; 
-      min-width: 40px; 
+      min-width: 32px; 
       text-align: center;
       box-shadow: 0 2px 8px rgba(2, 136, 209, 0.3);
     }
@@ -50,8 +51,8 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%; 
-      height: 10px; 
-      border-radius: 5px; 
+      height: 8px; 
+      border-radius: 4px; 
       background: #e0e0e0; 
       outline: none; 
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -65,12 +66,12 @@
     input[type=range]::-webkit-slider-thumb { 
       -webkit-appearance: none; 
       appearance: none; 
-      width: 24px; 
-      height: 24px; 
+      width: 20px; 
+      height: 20px; 
       border-radius: 50%; 
       background: linear-gradient(135deg, #0288d1, #00acc1); 
       cursor: pointer; 
-      box-shadow: 0 4px 12px rgba(2, 136, 209, 0.4), 0 0 0 3px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 3px 10px rgba(2, 136, 209, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.8);
       border: 2px solid #ffffff;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -82,17 +83,76 @@
       transform: scale(1.05);
       box-shadow: 0 2px 8px rgba(2, 136, 209, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.7);
     }
-    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: #a0aec0; margin-top: 4px; }
-    .textarea-container { margin: 24px 0; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #a0aec0; margin-top: 4px; }
+    
+    /* Radio Button Styles for 1-2-3 Rating */
+    .rating-options {
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .rating-option {
+      flex: 1;
+      text-align: center;
+    }
+    .rating-option input[type="radio"] {
+      display: none;
+    }
+    .rating-option label {
+      display: block;
+      padding: 16px 8px;
+      background: #f5f5f5;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .rating-option input[type="radio"]:checked + label {
+      background: linear-gradient(135deg, #0288d1, #00acc1);
+      color: white;
+      border-color: #0288d1;
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(2, 136, 209, 0.4);
+    }
+    .rating-option label:hover {
+      border-color: #0288d1;
+      background: #e3f2fd;
+      transform: scale(1.02);
+    }
+    .rating-emoji {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 6px;
+      transition: transform 0.2s ease;
+    }
+    .rating-option input[type="radio"]:checked + label .rating-emoji {
+      transform: scale(1.2);
+      animation: bounce 0.5s ease;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: scale(1.2); }
+      50% { transform: scale(1.35); }
+    }
+    .rating-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    
+    .textarea-container { margin: 16px 0; }
     textarea { 
       width: 100%; 
-      padding: 16px; 
+      padding: 12px; 
       border: 2px solid #e2e8f0; 
-      border-radius: 12px; 
+      border-radius: 10px; 
       font-family: inherit; 
-      font-size: 14px; 
+      font-size: 12px; 
       resize: vertical; 
-      min-height: 80px;
+      min-height: 60px;
       transition: border-color 0.3s ease;
     }
     textarea:focus { 
@@ -105,13 +165,13 @@
       background: linear-gradient(135deg, #0288d1, #00acc1); 
       color: white; 
       border: none; 
-      padding: 12px 24px; 
-      border-radius: 12px; 
-      font-size: 16px; 
+      padding: 10px 20px; 
+      border-radius: 10px; 
+      font-size: 14px; 
       font-weight: 700; 
       cursor: pointer; 
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
       font-family: 'Roboto', sans-serif;
     }
@@ -125,17 +185,18 @@
       box-shadow: 0 4px 15px rgba(2, 136, 209, 0.35);
     }
     .privacy-note { 
-      font-size: 13px; 
+      font-size: 11px; 
       color: #718096; 
       text-align: center; 
       line-height: 1.4;
     }
     .status { 
-      margin-top: 16px; 
-      padding: 12px; 
+      margin-top: 12px; 
+      padding: 10px; 
       border-radius: 8px; 
       text-align: center; 
       font-weight: 500;
+      font-size: 12px;
       opacity: 0;
       transition: opacity 0.3s ease;
     }
@@ -143,69 +204,203 @@
     .status.success { background: #c6f6d5; color: #22543d; }
     .status.error { background: #fed7d7; color: #c53030; }
 
+    /* Initial Prompt Styles */
+    #promptScreen {
+      text-align: center;
+    }
+    .prompt-message {
+      font-size: 16px;
+      color: #0d47a1;
+      font-weight: 600;
+      margin: 20px 0;
+      line-height: 1.6;
+    }
+    .prompt-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .prompt-btn {
+      width: 100%;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+    }
+    .btn-yes {
+      background: linear-gradient(135deg, #0288d1, #00acc1);
+      color: white;
+      box-shadow: 0 4px 15px rgba(2, 136, 209, 0.3);
+    }
+    .btn-yes:hover {
+      background: linear-gradient(135deg, #0277bd, #0097a7);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(2, 136, 209, 0.4);
+    }
+    .btn-remind {
+      background: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffc107;
+    }
+    .btn-remind:hover {
+      background: #ffe69c;
+      border-color: #ffb300;
+      transform: translateY(-2px);
+    }
+    .btn-no {
+      background: #f5f5f5;
+      color: #666;
+      border: 2px solid #e0e0e0;
+    }
+    .btn-no:hover {
+      background: #eeeeee;
+      border-color: #bdbdbd;
+    }
+    .hidden {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <div class="icon">⭐</div>
-      <h1>We Value Your Feedback!</h1>
-      <p class="subtitle">It only takes 10 seconds to help us improve your experience.<br>Please rate the following items — your input makes a real difference!</p>
+    <!-- Initial Prompt Screen -->
+    <div id="promptScreen">
+      <div class="header">
+        <div class="icon">⭐</div>
+        <h1>Your Opinion Matters!</h1>
+        <p class="prompt-message">
+          Would you like to take a quick 10-second survey to help us improve our services?
+        </p>
+      </div>
+      
+      <div class="prompt-buttons">
+        <button class="prompt-btn btn-yes" onclick="handleYes()">
+          ✅ Yes, I'd Love To!
+        </button>
+        <button class="prompt-btn btn-remind" onclick="handleRemindLater()">
+          ⏰ Remind Me Later
+        </button>
+        <button class="prompt-btn btn-no" onclick="handleNo()">
+          ❌ No, Thanks
+        </button>
+      </div>
+      
+      <div id="status" class="status"></div>
     </div>
 
-    <form id="surveyForm">
-      <div class="question-group">
-        <div class="question-label">
-          <span>🚀 Server Performance</span>
-          <span class="rating-value" id="v1">5</span>
-        </div>
-        <div class="slider-container">
-          <input id="q1" type="range" min="1" max="10" value="5" oninput="updateValue('v1', this.value); updateProgress()" />
-          <div class="range-labels">
-            <span>Poor</span>
-            <span>Excellent</span>
+    <!-- Survey Form (Hidden Initially) -->
+    <div id="surveyFormContainer" class="hidden">
+      <div class="header">
+        <div class="icon">⭐</div>
+        <h1>We Value Your Feedback!</h1>
+        <p class="subtitle">It only takes 10 seconds to help us improve your experience.<br>Please rate the following items — your input makes a real difference!</p>
+      </div>
+
+      <form id="surveyForm">
+        <div class="question-group">
+          <div class="question-label">
+            <span>Server Performance</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q1_1" name="q1" value="1" required>
+              <label for="q1_1">
+                <span class="rating-emoji">😞</span>
+                <span class="rating-label">Bad</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q1_2" name="q1" value="2" required>
+              <label for="q1_2">
+                <span class="rating-emoji">😐</span>
+                <span class="rating-label">Neutral</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q1_3" name="q1" value="3" required>
+              <label for="q1_3">
+                <span class="rating-emoji">😊</span>
+                <span class="rating-label">Good</span>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="question-group">
-        <div class="question-label">
-          <span>🛠️ Technical Support Quality</span>
-          <span class="rating-value" id="v2">5</span>
-        </div>
-        <div class="slider-container">
-          <input id="q2" type="range" min="1" max="10" value="5" oninput="updateValue('v2', this.value); updateProgress()" />
-          <div class="range-labels">
-            <span>Needs Work</span>
-            <span>Outstanding</span>
+        <div class="question-group">
+          <div class="question-label">
+            <span>Technical Support</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q2_1" name="q2" value="1" required>
+              <label for="q2_1">
+                <span class="rating-emoji">😞</span>
+                <span class="rating-label">Bad</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q2_2" name="q2" value="2" required>
+              <label for="q2_2">
+                <span class="rating-emoji">😐</span>
+                <span class="rating-label">Neutral</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q2_3" name="q2" value="3" required>
+              <label for="q2_3">
+                <span class="rating-emoji">😊</span>
+                <span class="rating-label">Good</span>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="question-group">
-        <div class="question-label">
-          <span>⭐ Overall Experience</span>
-          <span class="rating-value" id="v3">5</span>
-        </div>
-        <div class="slider-container">
-          <input id="q3" type="range" min="1" max="10" value="5" oninput="updateValue('v3', this.value); updateProgress()" />
-          <div class="range-labels">
-            <span>Disappointing</span>
-            <span>Amazing</span>
+        <div class="question-group">
+          <div class="question-label">
+            <span>Overall Rating</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q3_1" name="q3" value="1" required>
+              <label for="q3_1">
+                <span class="rating-emoji">😞</span>
+                <span class="rating-label">Bad</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q3_2" name="q3" value="2" required>
+              <label for="q3_2">
+                <span class="rating-emoji">😐</span>
+                <span class="rating-label">Neutral</span>
+              </label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q3_3" name="q3" value="3" required>
+              <label for="q3_3">
+                <span class="rating-emoji">😊</span>
+                <span class="rating-label">Good</span>
+              </label>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="textarea-container">
-        <textarea id="note" placeholder="💡 Got ideas? Tell us how we can serve you better! (optional)" maxlength="200" oninput="updateProgress()"></textarea>
-      </div>
+        <div class="textarea-container">
+          <textarea id="note" placeholder="Would you like to Share Additional Feedback ? (optional)" maxlength="200"></textarea>
+        </div>
 
-      <button type="button" class="submit-btn" onclick="submitForm()">
-        🚀 Submit Feedback
-      </button>
+        <button type="button" class="submit-btn" onclick="submitForm()">
+          🚀 Submit Feedback
+        </button>
 
-      <div id="status" class="status"></div>
-    </form>
+        <div id="formStatus" class="status"></div>
+      </form>
+    </div>
   </div>
 
 <script src="/script.js"></script>

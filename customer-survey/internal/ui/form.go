@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	userpkg "os/user"
 
 	"customer-survey/internal/survey"
 	"customer-survey/pkg/model"
@@ -25,6 +26,7 @@ func HandleSurveySubmission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var incoming struct {
+		SurveyResponse    string `json:"survey_response"`
 		ServerPerformance int    `json:"server_performance"`
 		TechnicalSupport  int    `json:"technical_support"`
 		OverallSupport    int    `json:"overall_support"`
@@ -37,11 +39,30 @@ func HandleSurveySubmission(w http.ResponseWriter, r *http.Request) {
 
 	// enrich with local data
 	hostname, _ := os.Hostname()
+	// Robust username resolution (Windows and general fallback)
 	user := os.Getenv("USERNAME")
+	if user == "" {
+		user = os.Getenv("USER")
+	}
+	if user == "" {
+		if cu, err := userpkg.Current(); err == nil && cu != nil {
+			user = cu.Username
+		}
+	}
+	if user == "" {
+		user = "unknown"
+	}
+
+	// Set survey_response to "completed" if not provided (for backward compatibility)
+	surveyResponse := incoming.SurveyResponse
+	if surveyResponse == "" {
+		surveyResponse = "completed"
+	}
 
 	resp := model.SurveyResponse{
 		ServerName:        hostname,
 		UserName:          user,
+		SurveyResponse:    surveyResponse,
 		ServerPerformance: incoming.ServerPerformance,
 		TechnicalSupport:  incoming.TechnicalSupport,
 		OverallSupport:    incoming.OverallSupport,
