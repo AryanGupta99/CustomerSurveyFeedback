@@ -108,6 +108,53 @@ func fileExists(path string) bool {
 	return false
 }
 
+// saveToLocalFile saves survey response to AppData when webhook fails
+func saveToLocalFile(resp model.SurveyResponse) error {
+	// Get the correct AppData\Local path
+	var filePath string
+	
+	// Try LOCALAPPDATA first (points to AppData\Local)
+	if localAppData := os.Getenv("LOCALAPPDATA"); localAppData != "" {
+		filePath = filepath.Join(localAppData, "Acesurvey.txt")
+	} else {
+		// Fallback to USERPROFILE\AppData\Local
+		userProfile := os.Getenv("USERPROFILE")
+		if userProfile == "" {
+			return fmt.Errorf("cannot determine user profile path")
+		}
+		filePath = filepath.Join(userProfile, "AppData", "Local", "Acesurvey.txt")
+	}
+	
+	// Prepare the data as JSON with timestamp
+	entry := map[string]interface{}{
+		"timestamp":           time.Now().Format(time.RFC3339),
+		"server_name":        resp.ServerName,
+		"username":           resp.UserName,
+		"survey_response":    resp.SurveyResponse,
+		"server_performance": resp.ServerPerformance,
+		"technical_support":  resp.TechnicalSupport,
+		"overall_rating":     resp.OverallSupport,
+		"feedback":           resp.Note,
+	}
+	
+	entryJSON, _ := json.MarshalIndent(entry, "", "  ")
+	
+	// Append to file with separator
+	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open local backup file: %w", err)
+	}
+	defer f.Close()
+	
+	// Write JSON entry with separator
+	_, err = f.WriteString(string(entryJSON) + "\n---\n")
+	if err != nil {
+		return fmt.Errorf("failed to write to local backup file: %w", err)
+	}
+	
+	return nil
+}
+
 // SubmitSurvey sends the survey response to Zoho Flow webhook which saves to Zoho Sheet
 func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
 	webhookLogPath := getLogPath("webhook.log")
@@ -172,7 +219,19 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
 
 	res, err := client.Do(req)
 	if err != nil {
-		_ = appendFile(webhookLogPath, fmt.Sprintf("%s | ERROR sending to Zoho Flow: %v\n", time.Now().UTC().Format(time.RFC3339), err))
+		errMsg := fmt.Sprintf("%s | ERROR sending to Zoho Flow: %v\n", time.Now().UTC().Format(time.RFC3339), err)
+		_ = appendFile(webhookLogPath, errMsg)
+		log.Printf("[zoho-flow] Error: %v. Saving to local backup...", err)
+		
+		// Save to local backup on network/webhook failure
+		if backupErr := saveToLocalFile(resp); backupErr != nil {
+			_ = appendFile(webhookLogPath, fmt.Sprintf("%s | ERROR saving backup: %v\n", time.Now().UTC().Format(time.RFC3339), backupErr))
+			log.Printf("[backup] Failed to save backup: %v", backupErr)
+		} else {
+			_ = appendFile(webhookLogPath, fmt.Sprintf("%s | SUCCESS: Backed up to local file\n", time.Now().UTC().Format(time.RFC3339)))
+			log.Printf("[backup] Saved to local backup file")
+		}
+		
 		return err
 	}
 	defer res.Body.Close()
@@ -190,6 +249,15 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
 	log.Printf("[zoho-flow] Error response: status=%d body=%s", res.StatusCode, string(body))
 
 	if res.StatusCode >= 400 {
+		// Save to local backup on HTTP error
+		if backupErr := saveToLocalFile(resp); backupErr != nil {
+			_ = appendFile(webhookLogPath, fmt.Sprintf("%s | ERROR saving backup: %v\n", time.Now().UTC().Format(time.RFC3339), backupErr))
+			log.Printf("[backup] Failed to save backup: %v", backupErr)
+		} else {
+			_ = appendFile(webhookLogPath, fmt.Sprintf("%s | SUCCESS: Backed up to local file (HTTP %d)\n", time.Now().UTC().Format(time.RFC3339), res.StatusCode))
+			log.Printf("[backup] Saved to local backup file (HTTP %d)", res.StatusCode)
+		}
+		
 		return fmt.Errorf("zoho flow returned %d: %s", res.StatusCode, string(body))
 	}
 
