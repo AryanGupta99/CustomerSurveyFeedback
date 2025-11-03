@@ -76,7 +76,7 @@ func getListener() (net.Listener, int, error) {
 func openAsApp(url string) {
 	// Set window size to fit the survey form perfectly
 	formWidth := 420
-	formHeight := 700
+	formHeight := 720
 
 	// Get screen resolution
 	screenW, screenH := getScreenResolution()
