@@ -1,0 +1,22 @@
+{
+  "name": "Ace Customer Survey",
+  "outputfilename": "customer-survey",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "frontend:dev:serverUrl": "",
+  "author": {
+    "name": "ACH",
+    "email": ""
+  },
+  "info": {
+    "companyName": "ACH",
+    "productName": "Customer Survey",
+    "productVersion": "2.0.0",
+    "copyright": "Copyright 2024 ACH",
+    "comments": "Customer feedback survey application"
+  },
+  "nsisType": "multiple",
+  "obfuscated": false,
+  "wailsjsdir": "./frontend"
+}

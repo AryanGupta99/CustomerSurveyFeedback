@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"runtime"
 	"syscall"
-	"time"
 )
 
 //go:embed static
@@ -29,37 +28,11 @@ func getScreenResolution() (int, int) {
 	return 1920, 1080
 }
 
-// RunDesktopUI launches the survey as a desktop application
-// It starts a local server and opens it in app mode (frameless window)
 func RunDesktopUI() error {
-	// Wire up handlers
-	http.HandleFunc("/", HandleIndex)
-	http.HandleFunc("/submit", HandleSurveySubmission)
-
-	// Bind to the first available port
-	ln, port, err := getListener()
-	if err != nil {
-		return fmt.Errorf("could not bind a port: %w", err)
-	}
-
-	// Serve in background
-	srv := &http.Server{Handler: nil}
-	go func() {
-		log.Printf("Starting server on :%d", port)
-		if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server error: %v", err)
-		}
-	}()
-
-	// Give the server a moment
-	time.Sleep(300 * time.Millisecond)
-
-	// Open in app mode (frameless browser window that looks like a desktop app)
-	url := fmt.Sprintf("http://localhost:%d", port)
-	openAsApp(url)
-
-	// Block indefinitely
-	select {}
+	// Use PURE Windows API - 100% native, NO browser!
+	// Only Windows MessageBox dialogs
+	// Zero dependencies, works everywhere
+	return RunPureNativeGUI()
 }
 
 func getListener() (net.Listener, int, error) {
@@ -145,7 +118,6 @@ func openAsApp(url string) {
 			}
 		}
 	}
-
 	// Fallback: regular browser
 	log.Printf("App mode not available, using default browser")
 	_ = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
