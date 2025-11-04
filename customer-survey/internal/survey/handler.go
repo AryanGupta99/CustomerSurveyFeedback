@@ -178,27 +178,14 @@ func SubmitSurvey(ctx context.Context, resp model.SurveyResponse) error {
 	// - feedback
 	// - survey_response (optional)
 	// - timestamp (optional)
-	// Map rating numbers to words
-	ratingWord := func(val int) string {
-		switch val {
-		case 3:
-			return "Good"
-		case 2:
-			return "Okay"
-		case 1:
-			return "Bad"
-		default:
-			return "Unknown"
-		}
-	}
 	payload := map[string]interface{}{
-		"server_name":        fmt.Sprintf("%v", resp.ServerName),
+		"machine_name":       fmt.Sprintf("%v", resp.ServerName),        // Zoho Flow expects: machine_name
 		"username":           fmt.Sprintf("%v", resp.UserName),
 		"survey_response":    fmt.Sprintf("%v", resp.SurveyResponse),
-		"server_performance": ratingWord(resp.ServerPerformance),
-		"technical_support":  ratingWord(resp.TechnicalSupport),
-		"overall_rating":     ratingWord(resp.OverallSupport),
-		"feedback":           fmt.Sprintf("%v", resp.Note),
+		"server_performance": resp.ServerPerformance,                    // Zoho Flow expects numeric value
+		"technical_support":  resp.TechnicalSupport,                    // Zoho Flow expects numeric value
+		"overall_support":    resp.OverallSupport,                      // Zoho Flow expects: overall_support
+		"note":               fmt.Sprintf("%v", resp.Note),             // Zoho Flow expects: note
 		"timestamp":          time.Now().Format(time.RFC3339),
 	}
 

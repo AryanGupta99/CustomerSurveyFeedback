@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ace Customer Survey</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.6s ease-out;
+      font-size: 14px;
+    }
+    ::-webkit-scrollbar { display: none; }
+    * { scrollbar-width: none; -ms-overflow-style: none; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    .container {
+      background: #ffffff;
+      border-radius: 0px;
+      box-shadow: none;
+      width: 420px;
+      max-width: 420px;
+      height: auto;
+      margin: 0;
+      animation: slideUp 0.7s ease-out;
+      overflow: hidden;
+      border: none;
+    }
+    
+    .content-wrapper {
+      padding: 12px 20px 16px 20px;
+      overflow-y: auto;
+      max-height: 90vh;
+      background: #fff;
+    }
+    
+    .content-wrapper::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .content-wrapper::-webkit-scrollbar-track {
+      background: #ffffff;
+      border-radius: 10px;
+    }
+    
+    .content-wrapper::-webkit-scrollbar-thumb {
+      background: #ffffff;
+      border-radius: 10px;
+    }
+    
+    .content-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+    }
+    
+    .header { text-align: center; margin-bottom: 10px; }
+    
+    .brand-logo {
+      display: block;
+      margin: 0 auto 8px auto;
+    }
+    
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c5282;
+      margin-bottom: 4px;
+      letter-spacing: -0.4px;
+    }
+    
+    .subtitle {
+      color: #64748b;
+      font-size: 11px;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+    .question-group {
+      margin-bottom: 10px;
+      padding: 0px;
+      background: transparent;
+      border-radius: 0px;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .question-group:hover {
+      border-color: transparent;
+      box-shadow: none;
+    }
+    
+    .question-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #2c5282;
+      font-size: 13px;
+      letter-spacing: -0.1px;
+    }
+    .rating-value {
+      background: linear-gradient(135deg, #0288d1, #00acc1);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 32px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(2, 136, 209, 0.3);
+    }
+    .slider-container { position: relative; margin-bottom: 8px; }
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #e0e0e0;
+      outline: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    input[type=range]::-webkit-slider-track {
+      height: 10px;
+      border-radius: 5px;
+      background: linear-gradient(to right, #0288d1 0%, #00acc1 100%);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0288d1, #00acc1);
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(2, 136, 209, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.8);
+      border: 2px solid #ffffff;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 6px 20px rgba(2, 136, 209, 0.5), 0 0 0 4px rgba(255, 255, 255, 0.9);
+    }
+    input[type=range]::-webkit-slider-thumb:active {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(2, 136, 209, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.7);
+    }
+    .range-labels { display: flex; justify-content: space-between; font-size: 10px; color: #a0aec0; margin-top: 4px; }
+    
+    /* Radio Button Styles for 1-2-3 Rating */
+    .rating-options {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 0px;
+    }
+    .rating-option {
+      flex: 1;
+      text-align: center;
+    }
+    .rating-option input[type="radio"] {
+      display: none;
+    }
+    .rating-option label {
+      display: block;
+      padding: 12px 8px;
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .rating-option input[type="radio"]:checked + label {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+      transform: scale(1.04);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+    
+    .rating-option label:hover {
+      border-color: #3b82f6;
+      background: #f0f9ff;
+      transform: scale(1.02);
+    }
+    .rating-emoji {
+      display: block;
+      font-size: 24px;
+      transition: transform 0.2s ease;
+    }
+    .rating-option input[type="radio"]:checked + label .rating-emoji {
+      transform: scale(1.1);
+      animation: bounce 0.5s ease;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: scale(1.1); }
+      50% { transform: scale(1.2); }
+    }
+    .rating-label {
+      display: block;
+      font-size: 9px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    
+    .textarea-container { margin: 10px 0 0 0; }
+    
+    textarea {
+      width: 100%;
+      padding: 10px 10px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      resize: none;
+      height: 70px;
+      transition: all 0.3s ease;
+      color: #1e293b;
+      background: #fff;
+      line-height: 1.4;
+    }
+    
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+    
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: #fafbfc;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 10px 0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-top: 8px;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    
+    .submit-btn:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+    }
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border: 2px solid transparent;
+      line-height: 1.5;
+    }
+    
+    .status.show { opacity: 1; }
+    
+    .status.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-color: #10b981;
+    }
+    
+    .status.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #ef4444;
+    }
+
+    /* Initial Prompt Styles */
+    #promptScreen {
+      text-align: center;
+      padding: 12px 20px 12px 20px !important;
+    }
+    
+    .prompt-message {
+      font-size: 15px;
+      color: #2c5282;
+      font-weight: 500;
+      margin: 12px 0 18px 0;
+      line-height: 1.6;
+    }
+    
+    .prompt-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    
+    .prompt-btn {
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .btn-yes {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+    
+    .btn-yes:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    }
+    
+    .btn-remind {
+      background: #fef3c7;
+      color: #92400e;
+      border: 2px solid #f59e0b;
+    }
+    
+    .btn-remind:hover {
+      background: #fde68a;
+      border-color: #d97706;
+      transform: translateY(-1px);
+    }
+    
+    .btn-no {
+      background: #fff;
+      color: #64748b;
+      border: 2px solid #cbd5e1;
+    }
+    
+    .btn-no:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      color: #475569;
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    /* Thank You Screen Styles */
+    .thank-you-message {
+      font-size: 16px;
+      color: #10b981;
+      font-weight: 600;
+      margin: 16px 0 8px 0;
+      line-height: 1.6;
+    }
+
+    .thank-you-submessage {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Initial Prompt Screen -->
+    <div id="promptScreen" class="content-wrapper">
+      <div class="header">
+        <img src="icon.png" alt="ACH Logo" class="brand-logo" style="width:72px;height:72px;object-fit:contain;">
+        <h1>Your Opinion Matters!</h1>
+        <p class="prompt-message">
+          Would you like to take a quick survey to help us improve our services?
+        </p>
+      </div>
+      
+      <div class="prompt-buttons">
+        <button class="prompt-btn btn-yes" onclick="handleYes()">
+          Yes, I'd Love To!
+        </button>
+        <button class="prompt-btn btn-remind" onclick="handleRemindLater()">
+          Remind Me Later
+        </button>
+        <button class="prompt-btn btn-no" onclick="handleNo()">
+          No, Thanks
+        </button>
+      </div>
+      
+      <div id="status" class="status"></div>
+    </div>
+
+    <!-- Survey Form (Hidden Initially) -->
+    <div id="surveyFormContainer" class="hidden content-wrapper">
+      <div class="header">
+        <img src="icon.png" alt="ACH Logo" class="brand-logo" style="width:72px;height:72px;object-fit:contain;">
+        <h1>We Value Your Feedback!</h1>
+        <p class="subtitle">Please rate the following — your input makes a real difference!</p>
+      </div>
+
+      <form id="surveyForm">
+        <div class="question-group">
+          <div class="question-label">
+            <span>Server Experience</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q1_3" name="q1" value="3" required>
+              <label for="q1_3"><span class="rating-emoji">😊</span><span class="rating-label">Good</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q1_2" name="q1" value="2" required>
+              <label for="q1_2"><span class="rating-emoji">😐</span><span class="rating-label">Okay</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q1_1" name="q1" value="1" required>
+              <label for="q1_1"><span class="rating-emoji">☹️</span><span class="rating-label">Bad</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question-group">
+          <div class="question-label">
+            <span>Technical Support</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q2_3" name="q2" value="3" required>
+              <label for="q2_3"><span class="rating-emoji">😊</span><span class="rating-label">Good</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q2_2" name="q2" value="2" required>
+              <label for="q2_2"><span class="rating-emoji">😐</span><span class="rating-label">Okay</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q2_1" name="q2" value="1" required>
+              <label for="q2_1"><span class="rating-emoji">☹️</span><span class="rating-label">Bad</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="question-group">
+          <div class="question-label">
+            <span>Overall Rating</span>
+          </div>
+          <div class="rating-options">
+            <div class="rating-option">
+              <input type="radio" id="q3_3" name="q3" value="3" required>
+              <label for="q3_3"><span class="rating-emoji">😊</span><span class="rating-label">Good</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q3_2" name="q3" value="2" required>
+              <label for="q3_2"><span class="rating-emoji">😐</span><span class="rating-label">Okay</span></label>
+            </div>
+            <div class="rating-option">
+              <input type="radio" id="q3_1" name="q3" value="1" required>
+              <label for="q3_1"><span class="rating-emoji">☹️</span><span class="rating-label">Bad</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="textarea-container">
+          <textarea id="note" placeholder="Additional Feedback? (optional)" maxlength="200"></textarea>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="submitForm()">
+          Submit Feedback
+        </button>
+
+        <div id="formStatus" class="status"></div>
+      </form>
+    </div>
+
+    <!-- Thank You Screen (Hidden Initially) -->
+    <div id="thankYouScreen" class="hidden content-wrapper">
+      <div class="header">
+        <img src="icon.png" alt="ACH Logo" class="brand-logo" style="width:72px;height:72px;object-fit:contain;">
+        <h1 style="color: #10b981;">Thank You!</h1>
+        <p class="thank-you-message">
+          ✅ Your feedback has been submitted successfully
+        </p>
+        <p class="thank-you-submessage">
+          We appreciate your time and valuable input. Your feedback helps us improve our services!
+        </p>
+      </div>
+    </div>
+  </div>
+
+<script src="wails/runtime/runtime.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

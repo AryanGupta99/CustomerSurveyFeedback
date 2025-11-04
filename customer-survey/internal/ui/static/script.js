@@ -12,7 +12,7 @@ async function handleRemindLater() {
   // Disable all buttons
   buttons.forEach(btn => btn.disabled = true);
   
-  statusEl.textContent = '⏰ We\'ll remind you next time!';
+  statusEl.textContent = 'We\'ll remind you next time!';
   statusEl.className = 'status success show';
   
   // Submit reminder response
@@ -48,7 +48,7 @@ async function handleNo() {
   // Disable all buttons
   buttons.forEach(btn => btn.disabled = true);
   
-  statusEl.textContent = '⏳ Saving your preference...';
+  statusEl.textContent = 'Saving your preference...';
   statusEl.className = 'status show';
   
   try {
@@ -68,7 +68,7 @@ async function handleNo() {
     });
     
     if (response.ok) {
-      statusEl.textContent = '✅ Thank you! Your preference has been recorded.';
+      statusEl.textContent = 'Thank you! Your preference has been recorded.';
       statusEl.className = 'status success show';
       
       // Close window after delay
@@ -80,7 +80,7 @@ async function handleNo() {
     }
   } catch (error) {
     console.error('Error:', error);
-    statusEl.textContent = '❌ Error recording response.';
+    statusEl.textContent = 'Error recording response.';
     statusEl.className = 'status error show';
     
     // Re-enable buttons
@@ -102,7 +102,7 @@ async function submitForm() {
   // Validate all questions are answered
   if (!q1Radio || !q2Radio || !q3Radio) {
     const status = document.getElementById('formStatus');
-    status.textContent = '⚠️ Please answer all three questions before submitting.';
+    status.textContent = 'Please answer all three questions before submitting.';
     status.className = 'status error show';
     
     setTimeout(() => {
@@ -118,7 +118,7 @@ async function submitForm() {
   
   // Disable button and show loading state
   submitBtn.disabled = true;
-  submitBtn.textContent = '⏳ Submitting your feedback...';
+  submitBtn.textContent = 'Submitting your feedback...';
   submitBtn.style.opacity = '0.7';
   
   const q1 = parseInt(q1Radio ? q1Radio.value : "0", 10);
@@ -158,7 +158,7 @@ async function submitForm() {
     
   } catch (error) {
     console.error('Submission error:', error);
-    status.textContent = '❌ Something went wrong. Please try again.';
+    status.textContent = 'Something went wrong. Please try again.';
     status.className = 'status error show';
     
     // Reset button
