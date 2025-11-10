@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+// RemindDuration is the default duration to use when the user selects "Remind Me Later".
+// Production default is 7 days. Tests and local debugging can override this via
+// the TEST_REMIND_MINUTES environment variable or by changing this variable.
+var RemindDuration = 7 * 24 * time.Hour
+
 // GetAppDataDir returns the per-user AppData folder for the survey app
 func GetAppDataDir() string {
 	appData := os.Getenv("APPDATA")
@@ -112,14 +117,23 @@ func MarkNoThanks() error {
 	return os.WriteFile(flagPath, []byte(timestamp), 0644)
 }
 
-// MarkRemindLater creates/updates remind.txt with current time + 7 days
+// MarkRemindLater creates/updates remind.txt with a reminder date.
+// Default production behavior is a 7-day reminder. For quick testing
+// we temporarily set this to 4 minutes.
 func MarkRemindLater() error {
 	if err := ensureAppDataDir(); err != nil {
 		return err
 	}
 
 	remindPath := filepath.Join(GetAppDataDir(), "remind.txt")
-	remindDate := time.Now().Add(7 * 24 * time.Hour)
+	// Allow a runtime override (TEST_REMIND_MINUTES) for quick testing.
+	duration := RemindDuration
+	if m := os.Getenv("TEST_REMIND_MINUTES"); m != "" {
+		if minutes, err := time.ParseDuration(m + "m"); err == nil {
+			duration = minutes
+		}
+	}
+	remindDate := time.Now().Add(duration)
 	remindDateStr := remindDate.Format(time.RFC3339)
 
 	return os.WriteFile(remindPath, []byte(remindDateStr), 0644)

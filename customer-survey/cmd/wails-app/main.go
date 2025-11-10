@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
@@ -209,6 +210,17 @@ func (a *App) ResetStartupSettings() map[string]interface{} {
 // startup is called when the app starts
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	// Force window to foreground on startup. This tries multiple strategies with small delays
+	// because Windows focus rules may block immediate foreground in some situations.
+	go func() {
+		// Short initial delay to allow window creation
+		time.Sleep(150 * time.Millisecond)
+		runtime.WindowShow(ctx)
+		runtime.WindowSetAlwaysOnTop(ctx, true)
+		// After a moment, remove always-on-top so normal window stacking resumes
+		time.Sleep(600 * time.Millisecond)
+		runtime.WindowSetAlwaysOnTop(ctx, false)
+	}()
 }
 
 // HandleRemindMeLater saves reminder settings and closes the app
