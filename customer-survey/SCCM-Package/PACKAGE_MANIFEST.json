@@ -1,0 +1,176 @@
+{
+  "packageInfo": {
+    "name": "Customer Survey Application",
+    "version": "2.0.0",
+    "buildDate": "2025-11-07",
+    "packageDate": "2025-11-07",
+    "author": "Aryan Gupta",
+    "organization": "Real Time Data Services Pvt Ltd",
+    "description": "Customer feedback survey application with automatic startup logic"
+  },
+  "deployment": {
+    "method": "SCCM",
+    "targetPlatform": "Windows 10/11, Server 2016+",
+    "targetUsers": "~10,000 users across dedicated and RDS servers",
+    "installLocation": "%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs\\StartUp",
+    "userDataLocation": "%APPDATA%\\CustomerSurvey",
+    "registryKey": "HKLM\\SOFTWARE\\CustomerSurvey"
+  },
+  "files": {
+    "executable": {
+      "name": "customer-survey.exe",
+      "description": "Main Wails application executable",
+      "framework": "Wails v2 + Go",
+      "architecture": "x64"
+    },
+    "configuration": {
+      "name": "config.json",
+      "description": "Webhook configuration for Zoho integration",
+      "required": true,
+      "mustEdit": true,
+      "editInstructions": "Update zoho_webhook_url with production endpoint"
+    },
+    "scripts": {
+      "install": {
+        "name": "Install.ps1",
+        "description": "SCCM installation script",
+        "command": "powershell.exe -ExecutionPolicy Bypass -File .\\Install.ps1 -Silent"
+      },
+      "uninstall": {
+        "name": "Uninstall.ps1",
+        "description": "SCCM uninstallation script",
+        "command": "powershell.exe -ExecutionPolicy Bypass -File .\\Uninstall.ps1 -Silent"
+      },
+      "detection": {
+        "name": "Detection.ps1",
+        "description": "SCCM detection script",
+        "returnCodes": {
+          "0": "Application installed",
+          "1": "Application not installed"
+        }
+      }
+    },
+    "documentation": {
+      "readme": "README.md - Complete deployment guide",
+      "quickGuide": "DEPLOYMENT.md - Quick reference for SCCM admins",
+      "manifest": "PACKAGE_MANIFEST.json - This file"
+    }
+  },
+  "features": {
+    "autoStartup": "Runs on every user login via Startup folder",
+    "flagManagement": "Per-user flags in %APPDATA% prevent repeat surveys",
+    "silentExit": "Exits without UI if survey already completed/declined",
+    "remindLater": "7-day reminder option with date tracking",
+    "webhookIntegration": "Submits responses to Zoho Flow webhook",
+    "offlineBackup": "Local backup in %LOCALAPPDATA%\\Acesurvey.txt"
+  },
+  "userFlags": {
+    "done.flag": "User completed survey - never show again",
+    "nothanks.flag": "User opted out - never show again",
+    "remind.txt": "User chose remind later - show after date expires (RFC3339 format)"
+  },
+  "sccmConfiguration": {
+    "applicationType": "Script Installer",
+    "installCommand": "powershell.exe -ExecutionPolicy Bypass -File \".\\Install.ps1\" -Silent",
+    "uninstallCommand": "powershell.exe -ExecutionPolicy Bypass -File \".\\Uninstall.ps1\" -Silent",
+    "detectionMethod": {
+      "type": "Registry",
+      "hive": "HKEY_LOCAL_MACHINE",
+      "key": "SOFTWARE\\CustomerSurvey",
+      "valueName": "Installed",
+      "valueType": "REG_DWORD",
+      "expectedValue": 1
+    },
+    "installBehavior": {
+      "installFor": "System",
+      "logonRequirement": "Whether or not a user is logged on",
+      "visibility": "Hidden",
+      "maxRuntime": 900,
+      "estimatedRuntime": 60
+    },
+    "deploymentSettings": {
+      "purpose": "Required",
+      "action": "Install",
+      "userExperience": "Install in background",
+      "rerunBehavior": "Never rerun"
+    }
+  },
+  "rolloutPhases": [
+    {
+      "phase": "Pilot",
+      "week": 1,
+      "servers": "5-10",
+      "description": "Initial testing with close monitoring"
+    },
+    {
+      "phase": "Limited",
+      "week": 2,
+      "servers": 100,
+      "description": "Limited rollout to verify stability"
+    },
+    {
+      "phase": "Expanded",
+      "week": 3,
+      "servers": 500,
+      "description": "Broader rollout with continued monitoring"
+    },
+    {
+      "phase": "Full",
+      "week": 4,
+      "servers": "~9400 (all remaining)",
+      "description": "Complete deployment to all target servers"
+    }
+  ],
+  "monitoring": {
+    "sccm": "Software Library → Applications → Customer Survey → View Status",
+    "logs": {
+      "install": "%TEMP%\\CustomerSurvey_Install.log",
+      "uninstall": "%TEMP%\\CustomerSurvey_Uninstall.log",
+      "sccm": "C:\\Windows\\CCM\\Logs\\AppEnforce.log",
+      "webhook": "%APPDATA%\\.customer-survey\\webhook.log"
+    },
+    "verification": {
+      "registry": "Get-ItemProperty HKLM:\\SOFTWARE\\CustomerSurvey",
+      "startup": "Get-Item %ProgramData%\\...\\StartUp\\customer-survey.exe",
+      "userFlags": "Get-ChildItem C:\\Users\\*\\AppData\\Roaming\\CustomerSurvey"
+    }
+  },
+  "troubleshooting": {
+    "exeNotLaunching": "Check Startup folder and antivirus",
+    "surveyRepeating": "Verify flag creation in %APPDATA%\\CustomerSurvey",
+    "surveyNotShowing": "Check if flag incorrectly exists, user can run: customer-survey.exe -reset",
+    "webhookFailing": "Verify config.json URL and network connectivity"
+  },
+  "security": {
+    "codeSigning": "Recommended before deployment",
+    "antivirusWhitelisting": "Submit to SOC for approval",
+    "communication": "HTTPS only to Zoho Flow",
+    "dataStorage": "Per-user isolation, no privileged access required",
+    "compliance": "No PII collection beyond survey responses"
+  },
+  "preDeploymentChecklist": [
+    "Built exe with 'wails build' in production mode",
+    "Updated config.json with correct webhook URL",
+    "Tested on pilot machines",
+    "Code signed exe (recommended)",
+    "Coordinated with SOC team for whitelisting",
+    "SCCM package created and tested",
+    "Detection method configured",
+    "Deployment collection created"
+  ],
+  "packageContents": [
+    "customer-survey.exe",
+    "config.json",
+    "Install.ps1",
+    "Uninstall.ps1",
+    "Detection.ps1",
+    "README.md",
+    "DEPLOYMENT.md",
+    "PACKAGE_MANIFEST.json"
+  ],
+  "support": {
+    "documentation": "See README.md for comprehensive guide",
+    "quickReference": "See DEPLOYMENT.md for SCCM admin quick start",
+    "escalation": "Check logs first, then contact IT Helpdesk"
+  }
+}

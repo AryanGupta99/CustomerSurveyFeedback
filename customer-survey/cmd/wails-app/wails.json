@@ -1,7 +1,8 @@
 {
   "name": "Ace Customer Survey",
-  "outputfilename": "customer-survey",
-  "frontend:install": "",
+  "outputfilename": "customer-survey.exe",
+  "icon": "",
+  "frontend:install": "npm install",
   "frontend:build": "",
   "frontend:dev:watcher": "",
   "frontend:dev:serverUrl": "",
