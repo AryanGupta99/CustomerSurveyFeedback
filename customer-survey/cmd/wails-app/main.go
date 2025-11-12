@@ -622,6 +622,39 @@ func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 
+	// Set environment variables to optimize WebView2 memory usage BEFORE Wails init
+	// These flags reduce GPU memory, disable hardware acceleration, and minimize caching
+	// Must be set before wails.Run() to take effect
+	os.Setenv("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
+		"--disable-gpu "+
+			"--disable-gpu-compositing "+
+			"--disable-software-rasterizer "+
+			"--disable-accelerated-2d-canvas "+
+			"--disable-gpu-sandbox "+
+			"--no-sandbox "+
+			"--disable-dev-shm-usage "+
+			"--disable-features=VizDisplayCompositor,Translate,BackForwardCache,AcceptCHFrame,MediaRouter,CalculateNativeWinOcclusion "+
+			"--disable-extensions "+
+			"--disable-component-extensions-with-background-pages "+
+			"--disable-background-networking "+
+			"--disable-sync "+
+			"--disable-translate "+
+			"--hide-scrollbars "+
+			"--metrics-recording-only "+
+			"--mute-audio "+
+			"--no-first-run "+
+			"--safebrowsing-disable-auto-update "+
+			"--disable-client-side-phishing-detection "+
+			"--disable-component-update "+
+			"--disable-default-apps "+
+			"--disable-domain-reliability "+
+			"--js-flags=--max-old-space-size=32") // Limit JS heap to 32MB
+
+	os.Setenv("WEBVIEW2_USER_DATA_FOLDER", filepath.Join(os.TempDir(), "ace-survey-wv2-"+fmt.Sprint(os.Getpid())))
+
+	// Force single process mode (experimental - may reduce stability but reduces memory)
+	os.Setenv("WEBVIEW2_RELEASE_CHANNEL_PREFERENCE", "0")
+
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "ACE Customer Survey",
@@ -640,7 +673,12 @@ func main() {
 			WindowIsTranslucent:  false,
 			DisableWindowIcon:    false,
 			IsZoomControlEnabled: false,
-			Theme:                windows.Dark,
+			Theme:                windows.Light,
+			// Optimize WebView2 for minimal memory usage
+			WebviewGpuIsDisabled:              true, // Disable GPU acceleration to reduce memory
+			DisableFramelessWindowDecorations: false,
+			// Additional performance optimizations
+			WebviewBrowserPath: "", // Use system default WebView2 runtime
 		},
 	})
 

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Testing Startup Package Functions (No UI) ===\n")
+	fmt.Println("=== Testing Startup Package Functions (No UI) ===")
 
 	// Show AppData location
 	appDataDir := startup.GetAppDataDir()

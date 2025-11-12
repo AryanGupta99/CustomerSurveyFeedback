@@ -10,6 +10,10 @@ import (
 func TestMarkAndCheckDone(t *testing.T) {
 	// Clean up before test
 	defer ResetAll()
+	// Ensure a clean slate before assertions to avoid noise from local machine state
+	if err := ResetAll(); err != nil {
+		t.Fatalf("Failed to reset state before test: %v", err)
+	}
 
 	// Initially should not be done
 	if IsSurveyDone() {
@@ -35,6 +39,9 @@ func TestMarkAndCheckDone(t *testing.T) {
 
 func TestMarkAndCheckNoThanks(t *testing.T) {
 	defer ResetAll()
+	if err := ResetAll(); err != nil {
+		t.Fatalf("Failed to reset state before test: %v", err)
+	}
 
 	if IsNoThanks() {
 		t.Error("NoThanks should not be set initially")
@@ -51,6 +58,9 @@ func TestMarkAndCheckNoThanks(t *testing.T) {
 
 func TestRemindLater(t *testing.T) {
 	defer ResetAll()
+	if err := ResetAll(); err != nil {
+		t.Fatalf("Failed to reset state before test: %v", err)
+	}
 
 	// Initially should not skip
 	shouldSkip, err := ShouldRemindLater()
@@ -96,6 +106,9 @@ func TestRemindLater(t *testing.T) {
 
 func TestShouldShowSurvey(t *testing.T) {
 	defer ResetAll()
+	if err := ResetAll(); err != nil {
+		t.Fatalf("Failed to reset state before test: %v", err)
+	}
 
 	// Initially should show
 	shouldShow, err := ShouldShowSurvey()
@@ -132,6 +145,9 @@ func TestShouldShowSurvey(t *testing.T) {
 
 func TestGetStatus(t *testing.T) {
 	defer ResetAll()
+	if err := ResetAll(); err != nil {
+		t.Fatalf("Failed to reset state before test: %v", err)
+	}
 
 	status := GetStatus()
 	if status != "Survey should be shown" {
